@@ -1,0 +1,63 @@
+using System;
+
+namespace TransakcijeApp
+{
+    // Zadatak 4: Sučelja
+    interface ITransakcija { void PrikaziTransakciju(); }
+    interface IUsporedba { bool IstaTransakcija(object obj); }
+
+    // Zadatak 6: Vlastita iznimka
+    class TransactionException : Exception
+    {
+        public TransactionException(string message) : base(message) { }
+    }
+
+    class Uplata : ITransakcija, IUsporedba
+    {
+        public int ID { get; set; }
+        public double Iznos { get; set; }
+
+        public Uplata(int id, double iznos)
+        {
+            if (iznos <= 0) 
+                throw new TransactionException("Iznos uplate mora biti pozitivan!");
+            this.ID = id;
+            this.Iznos = iznos;
+        }
+
+        public void PrikaziTransakciju() => Console.WriteLine($"ID: {ID}, Iznos: {Iznos} HRK");
+
+        public bool IstaTransakcija(object obj)
+        {
+            if (obj is Uplata druga) return this.ID == druga.ID;
+            return false;
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            while (true)
+            {
+                try
+                {
+                    Console.Write("Unesite iznos nove uplate (0 za izlaz): ");
+                    double iznos = double.Parse(Console.ReadLine());
+                    if (iznos == 0) break;
+
+                    Uplata u = new Uplata(101, iznos);
+                    u.PrikaziTransakciju();
+                }
+                catch (TransactionException ex)
+                {
+                    Console.WriteLine($"GRESKA: {ex.Message}");
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("GRESKA: Morate unijeti broj!");
+                }
+            }
+        }
+    }
+}
