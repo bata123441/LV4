@@ -1,0 +1,88 @@
+using System;
+
+namespace MjeseciApp
+{
+    // Definiranje enuma
+    enum Mjeseci { Sijecanj = 1, Veljaca, Ozujak, Travanj, Svibanj, Lipanj, Srpanj, Kolovoz, Rujan, Listopad, Studeni, Prosinac }
+
+    // Vlastita iznimka za stringove
+    class StringException : Exception
+    {
+        public StringException(string message) : base(message) { }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            int[] brojaciMjeseci = new int[13]; // indeks 0 za krive unose, 1-12 za mjesece
+
+            Console.WriteLine("--- IZBORNIK MJESECI ---");
+            foreach (int i in Enum.GetValues(typeof(Mjeseci)))
+            {
+                Console.WriteLine($"{i} = {(Mjeseci)i}");
+            }
+
+            while (true)
+            {
+                Console.WriteLine("\nUnesite broj mjeseca (ESC za kraj):");
+                
+                // Provjera je li pritisnut ESC
+                var tipka = Console.ReadKey(true);
+                if (tipka.Key == ConsoleKey.Escape) break;
+
+                string unos = Console.ReadLine();
+
+                try
+                {
+                    // 1. Provjera je li string (ako nije broj)
+                    if (!double.TryParse(unos, out double realni))
+                    {
+                        throw new StringException("Unesen je tekst umjesto broja!");
+                    }
+
+                    // 2. Provjera je li realni broj (ako ima točku ili zarez)
+                    if (unos.Contains(".") || unos.Contains(","))
+                    {
+                        throw new Exception("Unesen je realni broj! Dozvoljeni su samo cijeli brojevi.");
+                    }
+
+                    // 3. Ako je prošlo, pretvori u int
+                    int broj = int.Parse(unos);
+
+                    if (Enum.IsDefined(typeof(Mjeseci), broj))
+                    {
+                        Console.WriteLine($"Odabrali ste: {(Mjeseci)broj}");
+                        brojaciMjeseci[broj]++;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Taj broj mjeseca ne postoji!");
+                        brojaciMjeseci[0]++;
+                    }
+                }
+                catch (StringException ex)
+                {
+                    Console.WriteLine($"KRITIČNA POGREŠKA: {ex.Message}");
+                    IspisiStatistiku(brojaciMjeseci);
+                    return; // Prekida program prema zadatku
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"POGREŠKA: {ex.Message} Nastavite s unosom.");
+                }
+            }
+            IspisiStatistiku(brojaciMjeseci);
+        }
+
+        static void IspisiStatistiku(int[] polje)
+        {
+            Console.WriteLine("\n--- STATISTIKA UNOSA ---");
+            for (int i = 1; i <= 12; i++)
+            {
+                Console.WriteLine($"{(Mjeseci)i}: {polje[i]} puta");
+            }
+            Console.WriteLine($"Pogrešni cijeli brojevi: {polje[0]}");
+        }
+    }
+}
