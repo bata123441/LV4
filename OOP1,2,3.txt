@@ -1,0 +1,89 @@
+using System;
+using System.Collections.Generic;
+
+namespace GeometrijaApp
+{
+    interface IUsporediPovrsinu<T>
+    {
+        int Usporedi(T lik);
+    }
+
+    abstract class GeometrijskiLik
+    {
+        public string Boja { get; set; }
+
+        public static int BrojZelenihLikova = 0;
+
+        public GeometrijskiLik(string boja)
+        {
+            this.Boja = boja;
+            if (boja.ToLower() == "zelena")
+                BrojZelenihLikova++;
+        }
+        public abstract void Crtaj();
+        public abstract double Povrsina();
+
+        public static void IspisiZadanuBoju()
+        {
+            Console.WriteLine("Zadana boja za sve geometrijske likove je: Zelena");
+        }
+    }
+
+    class PravokutniTrokut : GeometrijskiLik, IUsporediPovrsinu<PravokutniTrokut>
+    {
+        public double KatetaA { get; set; }
+        public double KatetaB { get; set; }
+
+        public static int BrojacTrokuta = 0;
+
+        public PravokutniTrokut(double a, double b, string boja) : base(boja)
+        {
+            this.KatetaA = a;
+            this.KatetaB = b;
+            BrojacTrokuta++;
+        }
+
+        public override void Crtaj()
+        {
+            Console.WriteLine($"Crtam pravokutni trokut (Površina: {Povrsina()}, Boja: {Boja})");
+        }
+
+        public override double Povrsina()
+        {
+            return (KatetaA * KatetaB) / 2.0;
+        }
+
+
+        public int Usporedi(PravokutniTrokut drugi)
+        {
+            double p1 = this.Povrsina();
+            double p2 = drugi.Povrsina();
+
+            if (p1 == p2) return 0; 
+            return (p1 > p2) ? 1 : 2; 
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            GeometrijskiLik.IspisiZadanuBoju();
+
+            PravokutniTrokut t1 = new PravokutniTrokut(3, 4, "Zelena");
+            PravokutniTrokut t2 = new PravokutniTrokut(5, 12, "Plava");
+            PravokutniTrokut t3 = new PravokutniTrokut(2, 2, "Zelena");
+
+            t1.Crtaj();
+            t2.Crtaj();
+
+            int rezultat = t1.Usporedi(t2);
+            Console.WriteLine($"Rezultat usporedbe t1 i t2: {rezultat} (2 znači da je t2 veći)");
+
+            Console.WriteLine($"\nUkupno kreirano trokuta: {PravokutniTrokut.BrojacTrokuta}");
+            Console.WriteLine($"Ukupno zelenih likova: {GeometrijskiLik.BrojZelenihLikova}");
+
+            Console.ReadLine();
+        }
+    }
+}
